@@ -6,7 +6,7 @@
 /*   By: mmughedd <mmughedd@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/11 12:38:04 by mmughedd          #+#    #+#             */
-/*   Updated: 2024/04/27 15:03:38 by mmughedd         ###   ########.fr       */
+/*   Updated: 2024/04/27 17:46:29 by mmughedd         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,6 +53,8 @@ struct s_data
 	long	meals_number;
 	long	init_time;
 	bool	is_running;
+	bool	is_ready;
+	t_mutex	*data_mutex;
 	t_fork	*forks;
 	t_philo	*philos;
 };

@@ -6,7 +6,7 @@
 /*   By: mmughedd <mmughedd@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/11 09:26:10 by mmughedd          #+#    #+#             */
-/*   Updated: 2024/04/27 15:23:48 by mmughedd         ###   ########.fr       */
+/*   Updated: 2024/04/27 19:05:14 by mmughedd         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,11 +62,18 @@ void	handle_one_philo(t_data *data)
 	;
 }
 
-void	*run_sim(void *v_data)
+void	wait_threads(t_data *data)
 {
-	t_data	*data;
+	while (!data->is_ready)
+		;
+}
 
-	data = (t_data *)v_data;
+void	*run_sim(void *v_philo)
+{
+	t_philo	*philo;
+
+	philo = (t_philo *)v_philo;
+	wait_threads(philo->data);
 }
 
 void	sim_init(t_data *data)
@@ -81,8 +88,11 @@ void	sim_init(t_data *data)
 	else
 	{
 		while (++i < data->philo_number)
-			pthread_create(&data->philos[i].thread_id, NULL, run_sim, (void *)data);
+			pthread_create(&data->philos[i].thread_id, NULL, run_sim, (void *)&data->philos[i]);
 	}
+	pthread_mutex_unlock(data->data_mutex);
+	data->is_ready = true;
+	pthread_mutex_lock(data->data_mutex);
 
 }
 
@@ -99,17 +109,21 @@ void	init(t_data *data)
 	i = -1;
 	data->init_time = 0;
 	data->is_running = false;
+	data->is_ready = false;
 	data->forks = malloc(sizeof(t_fork) * data->philo_number);
 	data->philos = malloc(sizeof(t_philo) * data->philo_number);
-	if (!data->forks || !data->philos)
+	data->data_mutex = malloc(sizeof(t_mutex));
+	if (!data->forks || !data->philos || !data->data_mutex)
 			print_error("Malloc error");
+	if (pthread_mutex_init(data->data_mutex, NULL) != 0)
+			print_error("Mutex init error");
 	while (++i < data->philo_number)
 	{
 		if (pthread_mutex_init(&data->forks[i].fork, NULL) != 0)
 			print_error("Mutex init error");
 		data->forks[i].fork_id = i;
 	}
-	
+	philo_init(data);
 }
 
 
