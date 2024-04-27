@@ -6,7 +6,7 @@
 #    By: mmughedd <mmughedd@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/03/11 12:38:07 by mmughedd          #+#    #+#              #
-#    Updated: 2024/03/11 12:48:01 by mmughedd         ###   ########.fr        #
+#    Updated: 2024/04/27 12:13:51 by mmughedd         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -22,7 +22,7 @@ SRCS = $(addprefix $(SRC_PATH), $(SRC)) $(addprefix $(UTILS_PATH), $(UTILS))
 
 INC = -I./include
 
-OBJS = $(SRCS: .c=.o)
+OBJS = $(SRCS:.c=.o)
 
 NAME = philo
 
@@ -33,7 +33,7 @@ RM = rm -f
 FLAGS = -g # -Wextra -Werror -Wall
 
 %.o: %.c
-	$(CC) $(FLAGS) -c $< -o $@ $(INCS)
+	$(CC) $(FLAGS) -c $< -o $@ $(INC)
 
 all: $(NAME)
 
