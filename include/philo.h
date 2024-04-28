@@ -6,7 +6,7 @@
 /*   By: mmughedd <mmughedd@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/11 12:38:04 by mmughedd          #+#    #+#             */
-/*   Updated: 2024/04/27 17:46:29 by mmughedd         ###   ########.fr       */
+/*   Updated: 2024/04/28 10:32:59 by mmughedd         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,19 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <limits.h>
+#include <sys/time.h>
+#include <time.h>
+
+# define SECONDS 0
+# define MILLISEC 1
+# define MICROSEC 2
+
+# define EATING 0
+# define SLEEPING 1
+# define THINKING 2
+# define FIRST_FORK 3
+# define SECOND_FORK 4
+# define DEAD 5
 
 long	ft_atol(char *n);
 void	print_error(char *err);
@@ -42,6 +55,7 @@ typedef struct s_philo
 	t_fork		*second_fork;
 	pthread_t	thread_id;
 	t_data		*data;
+	t_mutex		*philo_mutex;
 }	t_philo;
 
 struct s_data
@@ -54,7 +68,9 @@ struct s_data
 	long	init_time;
 	bool	is_running;
 	bool	is_ready;
+	bool	is_finished;
 	t_mutex	*data_mutex;
+	t_mutex	*write_mutex;
 	t_fork	*forks;
 	t_philo	*philos;
 };

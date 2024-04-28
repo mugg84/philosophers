@@ -6,7 +6,7 @@
 #    By: mmughedd <mmughedd@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/03/11 12:38:07 by mmughedd          #+#    #+#              #
-#    Updated: 2024/04/27 12:13:51 by mmughedd         ###   ########.fr        #
+#    Updated: 2024/04/28 15:42:15 by mmughedd         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -30,7 +30,7 @@ CC = cc
 
 RM = rm -f
 
-FLAGS = -g # -Wextra -Werror -Wall
+FLAGS = -g #-fsanitize=thread -Wextra -Werror -Wall
 
 %.o: %.c
 	$(CC) $(FLAGS) -c $< -o $@ $(INC)
@@ -38,7 +38,7 @@ FLAGS = -g # -Wextra -Werror -Wall
 all: $(NAME)
 
 $(NAME): $(OBJS)
-	$(CC) $(FLAGS) -o $(NAME) $(OBJS) $(INC)
+	$(CC) $(FLAGS) -o $(NAME) $(OBJS) $(INC) -pthread
 
 clean:
 	$(RM) $(OBJS)
