@@ -6,7 +6,7 @@
 /*   By: mmughedd <mmughedd@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/11 09:26:10 by mmughedd          #+#    #+#             */
-/*   Updated: 2024/04/28 15:43:18 by mmughedd         ###   ########.fr       */
+/*   Updated: 2024/04/29 13:17:18 by mmughedd         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,25 +95,74 @@ bool	wait_is_ready(t_data *data)
 	return (ready);
 }
 
-bool	all_threads_running(t_mutex *mutex, long running_threads, long philo_number)
+bool	is_finished(t_data *data)
+{
+	bool	finished;
+
+	finished = false;
+	pthread_mutex_lock(data->data_mutex);
+	if (data->is_finished)
+		finished = true;
+	pthread_mutex_unlock(data->data_mutex);
+	return (finished);
+}
+
+bool	all_threads_running(t_mutex *mutex, t_data *data)
 {
 	bool	all_running;
 
 	all_running = false;
 	pthread_mutex_lock(mutex);
-	if (running_threads == philo_number)
+	if (data->running_threads == data->philo_number)
 		all_running = true;
 	pthread_mutex_unlock(mutex);
 	return (all_running);
 }
 
+bool	is_philo_dead(t_philo *philo)
+{
+	long	time;
+	long	time_to_die;
+	bool	is_dead;
+
+	is_dead = false;
+	pthread_mutex_lock(philo->philo_mutex);
+	if (!philo->is_full)
+	{
+		time = gettime(MILLISEC) - philo->last_meal_timer;
+		time_to_die = philo->data->time_to_die / 1000;
+		if (time > time_to_die)
+			is_dead = true;
+	}
+	pthread_mutex_unlock(philo->philo_mutex);
+	return (is_dead);
+}
+
 void	*philo_monitor(void *v_data)
 {
 	t_data	*data;
+	int		i;
+	long	time;
 
 	data = (t_data *)v_data;
-	while (!all_threads_running(data->data_mutex, data->running_threads, data->philo_number))
+	i = -1;
+	while (!all_threads_running(data->data_mutex, data))
 		;
+	while (!is_finished(data))
+	{
+		while (++i < data->philo_number && !is_finished(data))
+		{
+			if (is_philo_dead(data->philos + i))
+			{
+				pthread_mutex_lock(data->data_mutex);
+				data->is_finished = true;
+				pthread_mutex_unlock(data->data_mutex);
+				time = gettime(MILLISEC) - data->init_time;
+				printf("%-6ld %d is thinking\n", time, (data->philos + i)->id);
+			}
+		}
+	}
+	return (NULL);
 }
 
 void	wait_threads(t_data *data)
@@ -131,8 +180,13 @@ void	usleep_updated(long usec, t_data *data)
 	start = gettime(MICROSEC);
 	while (gettime(MICROSEC) - start < usec)
 	{
+		pthread_mutex_lock(data->data_mutex);
 		if (data->is_finished)
+		{
+			pthread_mutex_unlock(data->data_mutex);
 			break;
+		}
+		pthread_mutex_unlock(data->data_mutex);
 		elapsed = gettime(MICROSEC) - start;
 		rem = usec - elapsed;
 		if (rem > 1000)
@@ -149,9 +203,14 @@ void	print_status(int status, t_philo * philo)
 {
 	long	time;
 
-	time = gettime(MICROSEC) - philo->data->init_time;
+	time = gettime(MILLISEC) - philo->data->init_time;
+	pthread_mutex_lock(philo->philo_mutex);
 	if (philo->is_full)
-		return;
+	{
+		pthread_mutex_unlock(philo->philo_mutex);
+		return ;
+	}
+	pthread_mutex_unlock(philo->philo_mutex);
 	pthread_mutex_lock(philo->data->write_mutex);
 	if ((status == FIRST_FORK || status == SECOND_FORK) && !philo->data->is_finished)
 		printf("%6ld %d has taken a fork\n", time, philo->id);
@@ -170,13 +229,13 @@ void	print_status(int status, t_philo * philo)
 	// 		printf("%6ld %d has taken second fork number %d\n", time, philo->id, philo->data->forks[((philo->id)-1)].fork_id);
 	// }
 	if (status == EATING && !philo->data->is_finished)
-		printf("%-6ld %d is eating\n", time, philo->id);
+		printf("%6ld %d is eating\n", time, philo->id);
 	else if (status == SLEEPING && !philo->data->is_finished)
-		printf("%-6ld %d is sleeping\n", time, philo->id);
+		printf("%6ld %d is sleeping\n", time, philo->id);
 	else if (status == THINKING  && !philo->data->is_finished)
-		printf("%-6ld %d is thinking\n", time, philo->id);
+		printf("%6ld %d is thinking\n", time, philo->id);
 	else if (status == DEAD)
-		printf("%-6ld %d died\n", time, philo->id);
+		printf("%6ld %d died\n", time, philo->id);
 	pthread_mutex_unlock(philo->data->write_mutex);
 }
 
@@ -217,16 +276,21 @@ void	thinking(t_philo * philo)
 	print_status(THINKING, philo);
 }
 
+
+
 void	*run_sim(void *v_philo)
 {
 	t_philo	*philo;
 
 	philo = (t_philo *)v_philo;
 	wait_threads(philo->data);
+
 	pthread_mutex_lock(philo->data->data_mutex);
 	philo->data->running_threads++;
+	philo->last_meal_timer = gettime(MILLISEC);
 	pthread_mutex_unlock(philo->data->data_mutex);
-	philo->last_meal_timer = philo->data->init_time;
+
+	//philo->last_meal_timer = philo->data->init_time;
 	while (!philo->data->is_finished)
 	{
 		if (philo->is_full)
@@ -235,6 +299,7 @@ void	*run_sim(void *v_philo)
 		sleeping(philo);
 		thinking(philo);
 	}
+	return (NULL);
 }
 
 
@@ -285,7 +350,6 @@ void	init(t_data *data)
 	data->philos = malloc(sizeof(t_philo) * data->philo_number);
 	data->data_mutex = malloc(sizeof(t_mutex));
 	data->write_mutex = malloc(sizeof(t_mutex));
-	//data->monitor = malloc(sizeof(pthread_t));
 	if (!data->forks || !data->philos || !data->data_mutex || !data->write_mutex)
 		print_error("Malloc error");
 	if (pthread_mutex_init(data->data_mutex, NULL) != 0)
