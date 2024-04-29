@@ -95,6 +95,27 @@ bool	wait_is_ready(t_data *data)
 	return (ready);
 }
 
+bool	all_threads_running(t_mutex *mutex, long running_threads, long philo_number)
+{
+	bool	all_running;
+
+	all_running = false;
+	pthread_mutex_lock(mutex);
+	if (running_threads == philo_number)
+		all_running = true;
+	pthread_mutex_unlock(mutex);
+	return (all_running);
+}
+
+void	*philo_monitor(void *v_data)
+{
+	t_data	*data;
+
+	data = (t_data *)v_data;
+	while (!all_threads_running(data->data_mutex, data->running_threads, data->philo_number))
+		;
+}
+
 void	wait_threads(t_data *data)
 {
 	while (!wait_is_ready(data))
@@ -161,9 +182,7 @@ void	print_status(int status, t_philo * philo)
 
 void	eating(t_philo * philo)
 {
-	printf("1philo id: %d\n", philo->id);
 	pthread_mutex_lock(&philo->first_fork->fork);
-	printf("2philo id: %d\n", philo->id);
 	print_status(FIRST_FORK, philo);
 
 	pthread_mutex_lock(&philo->second_fork->fork);
@@ -204,6 +223,9 @@ void	*run_sim(void *v_philo)
 
 	philo = (t_philo *)v_philo;
 	wait_threads(philo->data);
+	pthread_mutex_lock(philo->data->data_mutex);
+	philo->data->running_threads++;
+	pthread_mutex_unlock(philo->data->data_mutex);
 	philo->last_meal_timer = philo->data->init_time;
 	while (!philo->data->is_finished)
 	{
@@ -231,6 +253,8 @@ void	sim_init(t_data *data)
 		while (++i < data->philo_number)
 			pthread_create(&data->philos[i].thread_id, NULL, run_sim, (void *)&data->philos[i]);
 	}
+	if (pthread_create(&data->monitor, NULL, philo_monitor, (void*)data) != 0)
+		print_error("Monitor pthread create error");
 	data->init_time = gettime(MILLISEC);
 	pthread_mutex_lock(data->data_mutex);
 	data->is_ready = true;
@@ -253,6 +277,7 @@ void	init(t_data *data)
 
 	i = -1;
 	data->init_time = 0;
+	data->running_threads = 0;
 	data->is_running = false;
 	data->is_ready = false;
 	data->is_finished = false;
@@ -260,6 +285,7 @@ void	init(t_data *data)
 	data->philos = malloc(sizeof(t_philo) * data->philo_number);
 	data->data_mutex = malloc(sizeof(t_mutex));
 	data->write_mutex = malloc(sizeof(t_mutex));
+	//data->monitor = malloc(sizeof(pthread_t));
 	if (!data->forks || !data->philos || !data->data_mutex || !data->write_mutex)
 		print_error("Malloc error");
 	if (pthread_mutex_init(data->data_mutex, NULL) != 0)

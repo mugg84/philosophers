@@ -60,18 +60,20 @@ typedef struct s_philo
 
 struct s_data
 {
-	long	philo_number;
-	long	time_to_die;
-	long	time_to_eat;
-	long	time_to_sleep;
-	long	meals_number;
-	long	init_time;
-	bool	is_running;
-	bool	is_ready;
-	bool	is_finished;
-	t_mutex	*data_mutex;
-	t_mutex	*write_mutex;
-	t_fork	*forks;
+	long		philo_number;
+	long		time_to_die;
+	long		time_to_eat;
+	long		time_to_sleep;
+	long		meals_number;
+	long		running_threads;
+	long		init_time;
+	bool		is_running;
+	bool		is_ready;
+	bool		is_finished;
+	t_mutex		*data_mutex;
+	t_mutex		*write_mutex;
+	t_fork		*forks;
+	pthread_t	monitor;
 	t_philo	*philos;
 };
 
