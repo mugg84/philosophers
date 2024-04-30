@@ -3,6 +3,8 @@
 		"philo.h": "c",
 		"pthread.h": "c",
 		"unistd.h": "c",
-		"stdlib.h": "c"
+		"stdlib.h": "c",
+		"time.h": "c",
+		"limits.h": "c"
 	}
 }

@@ -6,15 +6,15 @@
 #    By: mmughedd <mmughedd@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/03/11 12:38:07 by mmughedd          #+#    #+#              #
-#    Updated: 2024/04/29 13:01:30 by mmughedd         ###   ########.fr        #
+#    Updated: 2024/04/30 12:25:46 by mmughedd         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-SRC = main.c 
+SRC = main.c time.c actions.c bools.c philo.c setters.c
 
 SRC_PATH = src/
 
-UTILS = utils.c
+UTILS = utils.c write.c
 
 UTILS_PATH = utils/
 
@@ -30,7 +30,7 @@ CC = cc
 
 RM = rm -f
 
-FLAGS = -g -fsanitize=thread #-Wextra -Werror -Wall
+FLAGS = -g -Wextra -Werror -Wall #-fsanitize=thread
 
 %.o: %.c
 	$(CC) $(FLAGS) -c $< -o $@ $(INC)

@@ -6,13 +6,13 @@
 /*   By: mmughedd <mmughedd@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/11 12:38:16 by mmughedd          #+#    #+#             */
-/*   Updated: 2024/04/29 11:26:02 by mmughedd         ###   ########.fr       */
+/*   Updated: 2024/04/30 12:33:43 by mmughedd         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-static char	*check_input(char *n)
+char	*check_input(char *n)
 {
 	int		len;
 	char	*res;
@@ -54,8 +54,34 @@ long	ft_atol(char *n)
 	return (res);
 }
 
-void	print_error(char *err)
+void	free_data(t_data *data)
 {
-	printf("%s\n", err);
-	exit(EXIT_FAILURE);
+	int	i;
+
+	i = -1;
+	while (++i < data->philo_number)
+	{
+		pthread_mutex_destroy(&(data->philos + i)->philo_mutex);
+		pthread_mutex_destroy(&(data->forks + i)->fork);
+	}
+	pthread_mutex_destroy(&(data->data_mutex));
+	pthread_mutex_destroy(&(data->write_mutex));
+	free(data->forks);
+	free(data->philos);
+}
+
+void	wait_threads(t_data *data)
+{
+	while (!wait_is_ready(data))
+		;
+}
+
+void	create_threads(t_data *d)
+{
+	int	i;
+
+	i = -1;
+	while (++i < d->philo_number)
+		pthread_create(&d->philos[i].t_id, NULL,
+			run_sim, (void *)&d->philos[i]);
 }

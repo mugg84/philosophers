@@ -6,21 +6,21 @@
 /*   By: mmughedd <mmughedd@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/11 12:38:04 by mmughedd          #+#    #+#             */
-/*   Updated: 2024/04/30 08:40:19 by mmughedd         ###   ########.fr       */
+/*   Updated: 2024/04/30 13:29:01 by mmughedd         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef PHILO_H
-	#define PHILO_H
+# define PHILO_H
 
-#include <pthread.h>
-#include <stdio.h>
-#include <unistd.h>
-#include <stdlib.h>
-#include <stdbool.h>
-#include <limits.h>
-#include <sys/time.h>
-#include <time.h>
+# include <pthread.h>
+# include <stdio.h>
+# include <unistd.h>
+# include <stdlib.h>
+# include <stdbool.h>
+# include <limits.h>
+# include <sys/time.h>
+# include <time.h>
 
 # define SECONDS 0
 # define MILLISEC 1
@@ -33,11 +33,8 @@
 # define SECOND_FORK 4
 # define DEAD 5
 
-long	ft_atol(char *n);
-void	print_error(char *err);
-
-typedef struct s_data t_data;
-typedef pthread_mutex_t t_mutex;
+typedef struct s_data	t_data;
+typedef pthread_mutex_t	t_mutex;
 
 typedef struct s_fork
 {
@@ -53,7 +50,7 @@ typedef struct s_philo
 	bool		is_full;
 	t_fork		*first_fork;
 	t_fork		*second_fork;
-	pthread_t	thread_id;
+	pthread_t	t_id;
 	t_data		*data;
 	t_mutex		philo_mutex;
 }	t_philo;
@@ -76,5 +73,31 @@ struct s_data
 	pthread_t	monitor;
 	t_philo		*philos;
 };
+
+char	*check_input(char *n);
+long	ft_atol(char *n);
+long	gettime(int time);
+void	print_status(int status, t_philo *philo);
+void	print_error(char *err);
+void	usleep_updated(long usec, t_data *data);
+void	eating(t_philo *philo);
+void	sleeping(t_philo *philo);
+void	thinking(t_philo *philo, bool for_desync);
+void	free_data(t_data *data);
+void	*philo_monitor(void *v_data);
+void	*one_philo(void *v_philo);
+void	philo_init(t_data *data);
+void	set_philo_forks(t_philo *philo, t_data *data, int i);
+void	wait_threads(t_data *data);
+void	set_is_finished(t_data *data);
+void	set_is_ready(t_data *data);
+void	create_threads(t_data *d);
+void	*run_sim(void *v_philo);
+void	desynchronize_philos(t_philo *philo);
+bool	wait_is_ready(t_data *data);
+bool	is_finished(t_data *data);
+bool	all_threads_running(t_mutex *mutex, t_data *data);
+bool	is_philo_dead(t_philo *philo);
+bool	is_philo_full(t_philo *philo);
 
 #endif
