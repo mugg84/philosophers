@@ -6,7 +6,7 @@
 /*   By: mmughedd <mmughedd@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/11 12:38:04 by mmughedd          #+#    #+#             */
-/*   Updated: 2024/04/28 10:32:59 by mmughedd         ###   ########.fr       */
+/*   Updated: 2024/04/30 08:40:19 by mmughedd         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,7 +55,7 @@ typedef struct s_philo
 	t_fork		*second_fork;
 	pthread_t	thread_id;
 	t_data		*data;
-	t_mutex		*philo_mutex;
+	t_mutex		philo_mutex;
 }	t_philo;
 
 struct s_data
@@ -70,11 +70,11 @@ struct s_data
 	bool		is_running;
 	bool		is_ready;
 	bool		is_finished;
-	t_mutex		*data_mutex;
-	t_mutex		*write_mutex;
+	t_mutex		data_mutex;
+	t_mutex		write_mutex;
 	t_fork		*forks;
 	pthread_t	monitor;
-	t_philo	*philos;
+	t_philo		*philos;
 };
 
 #endif

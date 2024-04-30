@@ -6,7 +6,7 @@
 /*   By: mmughedd <mmughedd@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/11 09:26:10 by mmughedd          #+#    #+#             */
-/*   Updated: 2024/04/29 13:17:18 by mmughedd         ###   ########.fr       */
+/*   Updated: 2024/04/30 09:15:12 by mmughedd         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,27 +71,19 @@ void	philo_init(t_data *data)
 		philo->id = i + 1;
 		philo->is_full = false;
 		philo->data = data;
-		philo->philo_mutex = malloc(sizeof(t_mutex));
-		if (!philo->philo_mutex)
-			print_error("Mutex malloc error");
-		if(pthread_mutex_init(philo->philo_mutex, NULL) != 0)
+		if(pthread_mutex_init(&philo->philo_mutex, NULL) != 0)
 			print_error("Philo mutex error");
 		set_philo_forks(philo, data, i);
 	}
-}
-
-void	handle_one_philo(t_data *data)
-{
-	;
 }
 
 bool	wait_is_ready(t_data *data)
 {
 	bool	ready;
 
-	pthread_mutex_lock(data->data_mutex);
+	pthread_mutex_lock(&data->data_mutex);
 	ready = data->is_ready;
-	pthread_mutex_unlock(data->data_mutex);
+	pthread_mutex_unlock(&data->data_mutex);
 	return (ready);
 }
 
@@ -100,10 +92,10 @@ bool	is_finished(t_data *data)
 	bool	finished;
 
 	finished = false;
-	pthread_mutex_lock(data->data_mutex);
+	pthread_mutex_lock(&data->data_mutex);
 	if (data->is_finished)
 		finished = true;
-	pthread_mutex_unlock(data->data_mutex);
+	pthread_mutex_unlock(&data->data_mutex);
 	return (finished);
 }
 
@@ -126,7 +118,7 @@ bool	is_philo_dead(t_philo *philo)
 	bool	is_dead;
 
 	is_dead = false;
-	pthread_mutex_lock(philo->philo_mutex);
+	pthread_mutex_lock(&philo->philo_mutex);
 	if (!philo->is_full)
 	{
 		time = gettime(MILLISEC) - philo->last_meal_timer;
@@ -134,31 +126,55 @@ bool	is_philo_dead(t_philo *philo)
 		if (time > time_to_die)
 			is_dead = true;
 	}
-	pthread_mutex_unlock(philo->philo_mutex);
+	pthread_mutex_unlock(&philo->philo_mutex);
 	return (is_dead);
+}
+
+void	print_status(int status, t_philo * philo)
+{
+	long	time;
+
+	time = gettime(MILLISEC) - philo->data->init_time;
+	pthread_mutex_lock(&philo->philo_mutex);
+	if (philo->is_full)
+	{
+		pthread_mutex_unlock(&philo->philo_mutex);
+		return ;
+	}
+	pthread_mutex_unlock(&philo->philo_mutex);
+	pthread_mutex_lock(&philo->data->write_mutex);
+	if ((status == FIRST_FORK || status == SECOND_FORK) && !is_finished(philo->data))
+		printf("%6ld %d has taken a fork\n", time, philo->id);
+	if (status == EATING && !is_finished(philo->data))
+		printf("%6ld %d is eating\n", time, philo->id);
+	else if (status == SLEEPING && !is_finished(philo->data))
+		printf("%6ld %d is sleeping\n", time, philo->id);
+	else if (status == THINKING  && !is_finished(philo->data))
+		printf("%6ld %d is thinking\n", time, philo->id);
+	else if (status == DEAD)
+		printf("%6ld %d died\n", time, philo->id);
+	pthread_mutex_unlock(&philo->data->write_mutex);
 }
 
 void	*philo_monitor(void *v_data)
 {
 	t_data	*data;
 	int		i;
-	long	time;
 
 	data = (t_data *)v_data;
-	i = -1;
-	while (!all_threads_running(data->data_mutex, data))
+	while (!all_threads_running(&data->data_mutex, data))
 		;
 	while (!is_finished(data))
 	{
+		i = -1;
 		while (++i < data->philo_number && !is_finished(data))
 		{
 			if (is_philo_dead(data->philos + i))
 			{
-				pthread_mutex_lock(data->data_mutex);
+				pthread_mutex_lock(&data->data_mutex);
 				data->is_finished = true;
-				pthread_mutex_unlock(data->data_mutex);
-				time = gettime(MILLISEC) - data->init_time;
-				printf("%-6ld %d is thinking\n", time, (data->philos + i)->id);
+				pthread_mutex_unlock(&data->data_mutex);
+				print_status(DEAD, data->philos + i);
 			}
 		}
 	}
@@ -180,13 +196,8 @@ void	usleep_updated(long usec, t_data *data)
 	start = gettime(MICROSEC);
 	while (gettime(MICROSEC) - start < usec)
 	{
-		pthread_mutex_lock(data->data_mutex);
-		if (data->is_finished)
-		{
-			pthread_mutex_unlock(data->data_mutex);
+		if (is_finished(data))
 			break;
-		}
-		pthread_mutex_unlock(data->data_mutex);
 		elapsed = gettime(MICROSEC) - start;
 		rem = usec - elapsed;
 		if (rem > 1000)
@@ -199,46 +210,6 @@ void	usleep_updated(long usec, t_data *data)
 	}
 }
 
-void	print_status(int status, t_philo * philo)
-{
-	long	time;
-
-	time = gettime(MILLISEC) - philo->data->init_time;
-	pthread_mutex_lock(philo->philo_mutex);
-	if (philo->is_full)
-	{
-		pthread_mutex_unlock(philo->philo_mutex);
-		return ;
-	}
-	pthread_mutex_unlock(philo->philo_mutex);
-	pthread_mutex_lock(philo->data->write_mutex);
-	if ((status == FIRST_FORK || status == SECOND_FORK) && !philo->data->is_finished)
-		printf("%6ld %d has taken a fork\n", time, philo->id);
-	// if (philo->id % 2 == 0)
-	// {
-	// 	if (status == FIRST_FORK && !philo->data->is_finished)
-	// 		printf("%6ld %d has taken first fork number %d\n", time, philo->id, philo->data->forks[((philo->id)-1)].fork_id);
-	// 	else if(status == SECOND_FORK && !philo->data->is_finished)
-	// 		printf("%6ld %d has taken second fork number %d\n", time, philo->id, philo->data->forks[(philo->id) % philo->data->philo_number].fork_id);
-	// }
-	// else
-	// {
-	// 	if (status == FIRST_FORK && !philo->data->is_finished)
-	// 		printf("%6ld %d has taken first fork number %d\n", time, philo->id,  philo->data->forks[(philo->id) % philo->data->philo_number].fork_id);
-	// 	else if(status == SECOND_FORK && !philo->data->is_finished)
-	// 		printf("%6ld %d has taken second fork number %d\n", time, philo->id, philo->data->forks[((philo->id)-1)].fork_id);
-	// }
-	if (status == EATING && !philo->data->is_finished)
-		printf("%6ld %d is eating\n", time, philo->id);
-	else if (status == SLEEPING && !philo->data->is_finished)
-		printf("%6ld %d is sleeping\n", time, philo->id);
-	else if (status == THINKING  && !philo->data->is_finished)
-		printf("%6ld %d is thinking\n", time, philo->id);
-	else if (status == DEAD)
-		printf("%6ld %d died\n", time, philo->id);
-	pthread_mutex_unlock(philo->data->write_mutex);
-}
-
 void	eating(t_philo * philo)
 {
 	pthread_mutex_lock(&philo->first_fork->fork);
@@ -247,9 +218,9 @@ void	eating(t_philo * philo)
 	pthread_mutex_lock(&philo->second_fork->fork);
 	print_status(SECOND_FORK, philo);
 
-	pthread_mutex_lock(philo->philo_mutex);
+	pthread_mutex_lock(&philo->philo_mutex);
 	philo->last_meal_timer = gettime(MILLISEC);
-	pthread_mutex_unlock(philo->philo_mutex);
+	pthread_mutex_unlock(&philo->philo_mutex);
 	philo->meals_counter++;
 
 	print_status(EATING, philo);
@@ -257,9 +228,9 @@ void	eating(t_philo * philo)
 
 	if (philo->data->meals_number > 0 && philo->meals_counter == philo->data->meals_number)
 	{
-		pthread_mutex_lock(philo->philo_mutex);
+		pthread_mutex_lock(&philo->philo_mutex);
 		philo->is_full = true;
-		pthread_mutex_unlock(philo->philo_mutex);
+		pthread_mutex_unlock(&philo->philo_mutex);
 	}
 	pthread_mutex_unlock(&philo->first_fork->fork);
 	pthread_mutex_unlock(&philo->second_fork->fork);
@@ -276,7 +247,21 @@ void	thinking(t_philo * philo)
 	print_status(THINKING, philo);
 }
 
+void	*handle_one_philo(void *v_philo)
+{
+	t_philo	*philo;
 
+	philo = (t_philo *)v_philo;
+	wait_threads(philo->data);
+	pthread_mutex_lock(&philo->data->data_mutex);
+	philo->data->running_threads++;
+	philo->last_meal_timer = gettime(MILLISEC);
+	pthread_mutex_unlock(&philo->data->data_mutex);
+	print_status(FIRST_FORK, philo);
+	while (!is_finished(philo->data))
+		usleep_updated(60, philo->data);
+	return (NULL);
+}
 
 void	*run_sim(void *v_philo)
 {
@@ -285,13 +270,12 @@ void	*run_sim(void *v_philo)
 	philo = (t_philo *)v_philo;
 	wait_threads(philo->data);
 
-	pthread_mutex_lock(philo->data->data_mutex);
+	pthread_mutex_lock(&philo->data->data_mutex);
 	philo->data->running_threads++;
 	philo->last_meal_timer = gettime(MILLISEC);
-	pthread_mutex_unlock(philo->data->data_mutex);
-
-	//philo->last_meal_timer = philo->data->init_time;
-	while (!philo->data->is_finished)
+	pthread_mutex_unlock(&philo->data->data_mutex);
+	
+	while (!is_finished(philo->data))
 	{
 		if (philo->is_full)
 			break;
@@ -302,8 +286,6 @@ void	*run_sim(void *v_philo)
 	return (NULL);
 }
 
-
-
 void	sim_init(t_data *data)
 {
 	int	i;
@@ -312,7 +294,7 @@ void	sim_init(t_data *data)
 	if (data->meals_number == 0)
 		return ;
 	else if (data->philo_number == 1)
-		handle_one_philo(data);
+		pthread_create(&data->philos->thread_id, NULL, handle_one_philo, (void *)data->philos);
 	else
 	{
 		while (++i < data->philo_number)
@@ -321,19 +303,35 @@ void	sim_init(t_data *data)
 	if (pthread_create(&data->monitor, NULL, philo_monitor, (void*)data) != 0)
 		print_error("Monitor pthread create error");
 	data->init_time = gettime(MILLISEC);
-	pthread_mutex_lock(data->data_mutex);
+	pthread_mutex_lock(&data->data_mutex);
 	data->is_ready = true;
-	pthread_mutex_unlock(data->data_mutex);
+	pthread_mutex_unlock(&data->data_mutex);
 	i = -1;
 	while (++i < data->philo_number)
 		pthread_join(data->philos[i].thread_id, NULL);
-	//full
+
+	pthread_mutex_lock(&data->data_mutex);
+	data->is_finished = true;
+	pthread_mutex_unlock(&data->data_mutex);
+	
+	pthread_join(data->monitor, NULL);
 }
 
 
-void	free_data(t_data **data)
+void	free_data(t_data *data)
 {
-	free(*data);
+	int	i;
+	
+	i = -1;
+	while (++i < data->philo_number)
+	{
+		pthread_mutex_destroy(&(data->philos + i)->philo_mutex);
+		pthread_mutex_destroy(&(data->forks + i)->fork);
+	}
+	pthread_mutex_destroy(&(data->data_mutex));
+	pthread_mutex_destroy(&(data->write_mutex));
+	free(data->forks);
+	free(data->philos);
 }
 
 void	init(t_data *data)
@@ -348,13 +346,11 @@ void	init(t_data *data)
 	data->is_finished = false;
 	data->forks = malloc(sizeof(t_fork) * data->philo_number);
 	data->philos = malloc(sizeof(t_philo) * data->philo_number);
-	data->data_mutex = malloc(sizeof(t_mutex));
-	data->write_mutex = malloc(sizeof(t_mutex));
-	if (!data->forks || !data->philos || !data->data_mutex || !data->write_mutex)
+	if (!data->forks || !data->philos)
 		print_error("Malloc error");
-	if (pthread_mutex_init(data->data_mutex, NULL) != 0)
+	if (pthread_mutex_init(&data->data_mutex, NULL) != 0)
 		print_error("Data mutex init error");
-	if (pthread_mutex_init(data->write_mutex, NULL) != 0)
+	if (pthread_mutex_init(&data->write_mutex, NULL) != 0)
 		print_error("Write mutex init error");
 	while (++i < data->philo_number)
 	{
@@ -364,8 +360,6 @@ void	init(t_data *data)
 	}
 	philo_init(data);
 }
-
-
 
 int	main(int argc, char *argv[])
 {
@@ -379,7 +373,7 @@ int	main(int argc, char *argv[])
 		parser(argv, &data);
 		init(data);
 		sim_init(data);
-		free_data(&data);
+		free_data(data);
 	}
 	else
 		print_error("Wrong input\n");
