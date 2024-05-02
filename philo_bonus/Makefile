@@ -6,46 +6,40 @@
 #    By: mmughedd <mmughedd@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/03/11 12:38:07 by mmughedd          #+#    #+#              #
-#    Updated: 2024/04/30 12:25:46 by mmughedd         ###   ########.fr        #
+#    Updated: 2024/05/02 14:21:49 by mmughedd         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-SRC = main.c time.c actions.c bools.c philo.c setters.c
+BONUS = main_b.c
 
-SRC_PATH = src/
+BONUS_PATH = bonus/
 
-UTILS = utils.c write.c
+BNS = $(addprefix $(BONUS_PATH), $(BONUS))
 
-UTILS_PATH = utils/
+INC_B = -I./include_b
 
-SRCS = $(addprefix $(SRC_PATH), $(SRC)) $(addprefix $(UTILS_PATH), $(UTILS))
+OBJS_B = $(BNS:.c=.o)
 
-INC = -I./include
-
-OBJS = $(SRCS:.c=.o)
-
-NAME = philo
+NAME_B = philo_bonus
 
 CC = cc
 
 RM = rm -f
 
-FLAGS = -g -Wextra -Werror -Wall #-fsanitize=thread
+FLAGS = -g -Wextra -Werror -Wall -fsanitize=thread
 
 %.o: %.c
-	$(CC) $(FLAGS) -c $< -o $@ $(INC)
+	$(CC) $(FLAGS) -c $< -o $@ $(INC_B)
 
-all: $(NAME)
-
-$(NAME): $(OBJS)
-	$(CC) $(FLAGS) -o $(NAME) $(OBJS) $(INC) -pthread
-
+bonus: $(OBJS_B)
+	$(CC) $(FLAGS) -o $(NAME_B) $(OBJS_B) $(INC_B) -pthread -lrt
+	
 clean:
-	$(RM) $(OBJS)
+	$(RM) $(OBJS_B)
 
 fclean: clean
-	$(RM) $(NAME)
+	$(RM) $(NAME_B)
 
-re: fclean all
+re: fclean bonus
 
-phony: all clean fclean re
+phony: bonus clean fclean re

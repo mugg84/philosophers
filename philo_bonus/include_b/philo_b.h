@@ -6,7 +6,7 @@
 /*   By: mmughedd <mmughedd@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/01 09:09:38 by mmughedd          #+#    #+#             */
-/*   Updated: 2024/05/01 10:59:06 by mmughedd         ###   ########.fr       */
+/*   Updated: 2024/05/02 12:01:51 by mmughedd         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,9 +20,10 @@
 # include <stdbool.h>
 # include <limits.h>
 # include <sys/time.h>
-# include <sys/types.h>
-# include <time.h>
-# include "semaphore.h"
+# include <sys/wait.h>
+# include <fcntl.h>
+# include <semaphore.h>
+# include <signal.h>
 
 # define MILLISEC 0
 # define MICROSEC 1
@@ -41,15 +42,17 @@ typedef struct s_data
 	long		time_to_eat;
 	long		time_to_sleep;
 	long		meals_number;
+	long		meals_target;
 	long		init_time;
-	long		index;
+	long		last_meal;
+	int			index;
 	bool		is_running;
 	bool		is_finished;
 	bool		is_dead;
 	sem_t		*sem_print;
 	sem_t		*sem_fork;
 	pid_t		*pid;
-	pthread_t	monitor;	
+	pthread_t	monitor;
 } t_data;
 
 #endif
