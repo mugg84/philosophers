@@ -6,7 +6,7 @@
 /*   By: mmughedd <mmughedd@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/01 08:52:26 by mmughedd          #+#    #+#             */
-/*   Updated: 2024/05/02 14:34:39 by mmughedd         ###   ########.fr       */
+/*   Updated: 2024/05/03 13:58:39 by mmughedd         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -116,114 +116,113 @@ void	parser(char *argv[], t_data **data)
 void	set_data(t_data *data)
 {
 	data->init_time = 0;
-	data->index = 0;
-	data->last_meal = 0;
-	data->meals_number = 0;
-	data->is_running = false;
-	data->is_finished = false;
-	data->is_dead = false;
-	data->pid = malloc(sizeof(pid_t) * data->philo_number);
-	if (!data->pid)
-		print_error("Process malloc error");
+	data->is_running = 0;
+	data->is_finished = 0;
 	sem_unlink("/sem_print");
 	sem_unlink("/sem_fork");
+	sem_unlink("/sem_finished");
+	sem_unlink("/sem_dead");
 	data->sem_print = sem_open("/sem_print", O_CREAT, 0644, 1);
 	data->sem_fork = sem_open("/sem_fork",  O_CREAT, 0644, data->philo_number);
-	if (!data->sem_print || !data->sem_fork)
+	data->sem_finished = sem_open("/sem_finished", O_CREAT, 0644, 1);
+	data->sem_dead = sem_open("/sem_dead", O_CREAT, 0644, 1);
+	if (!data->sem_print || !data->sem_fork || !data->sem_finished || !data->sem_dead)
 		print_error("Semaphore open error");
 }
 
-void	print_status(int status, t_data *data)
+void	print_status(int status, t_philo *philo)
 {
 	long	time;
 
-	time = gettime(MILLISEC) - data->init_time;
-	sem_wait(data->sem_print);
-	if ((status == FIRST_FORK || status == SECOND_FORK) && !data->is_finished)
-		printf("%6ld %d has taken a fork\n", time, data->index);
-	if (status == EATING && !data->is_finished)
-		printf("%6ld %d is eating\n", time, data->index);
-	else if (status == SLEEPING && !data->is_finished)
-		printf("%6ld %d is sleeping\n", time, data->index);
-	else if (status == THINKING && !data->is_finished)
-		printf("%6ld %d is thinking\n", time, data->index);
-	else if (status == DEAD && !data->is_finished)
-		printf("%6ld %d died\n", time, data->index);
-	sem_post(data->sem_print);
+	time = gettime(MILLISEC) - philo->data->init_time;
+	sem_wait(philo->data->sem_print);
+	if ((status == FIRST_FORK || status == SECOND_FORK))
+		printf("%6ld %d has taken a fork\n", time, philo->index);
+	if (status == EATING)
+		printf("%6ld %d is eating\n", time, philo->index);
+	else if (status == SLEEPING)
+		printf("%6ld %d is sleeping\n", time, philo->index);
+	else if (status == THINKING)
+		printf("%6ld %d is thinking\n", time, philo->index);
+	else if (status == DEAD)
+		printf("%6ld %d died\n", time, philo->index);
+	sem_post(philo->data->sem_print);
 }
 
-void	eating(t_data *data)
+void	eating(t_philo *philo)
 {
-	sem_wait(data->sem_fork);
-	print_status(FIRST_FORK, data);
-	sem_wait(data->sem_fork);
-	print_status(SECOND_FORK, data);
-	print_status(EATING, data);
-	usleep_updated(data->time_to_eat);
-	data->last_meal = gettime(MILLISEC);
-	sem_post(data->sem_fork);
-	sem_post(data->sem_fork);
-	data->meals_number++;
+	sem_wait(philo->data->sem_fork);
+	print_status(FIRST_FORK, philo);
+	sem_wait(philo->data->sem_fork);
+	print_status(SECOND_FORK, philo);
+	print_status(EATING, philo);
+	usleep_updated(philo->data->time_to_eat);
+	philo->last_meal = gettime(MILLISEC);
+	sem_post(philo->data->sem_fork);
+	sem_post(philo->data->sem_fork);
+	philo->meals_counter++;
 }
 
-void	sleeping(t_data *data)
+void	sleeping(t_philo *philo)
 {
-	print_status(SLEEPING, data);
-	usleep_updated(data->time_to_sleep);
+	print_status(SLEEPING, philo);
+	usleep_updated(philo->data->time_to_sleep);
 }
 
-void	thinking(t_data *data)
+void	thinking(t_philo *philo)
 {
-	print_status(THINKING, data);
+	print_status(THINKING, philo);
 }
 
-void	*monitor_sim(void *v_data)
+void	*monitor_sim(void *v_philo)
 {
-	t_data	*data;
+	t_philo	*philo;
 	long	time;
 	
-	data = (t_data *)v_data;
-	while (!data->is_finished)
+	philo = (t_philo *)v_philo;
+	while (1)
 	{
 		usleep_updated(60);
 		time = gettime(MILLISEC);
-		if (time - data->last_meal >= data->time_to_die / 1000)
+		sem_wait(philo->data->sem_dead);
+		if (time - philo->last_meal >= philo->data->time_to_die / 1000)
 		{
-			print_status(DEAD, data);
-			data->is_dead = true;
-			data->is_finished = true;
+			print_status(DEAD, philo);
+			sem_post(philo->data->sem_finished);
+			//sem_post(philo->sem_finished);
+			//philo->sem_finished = true;
 			break;
 		}
-		else if (data->meals_number == data -> meals_target)
+		sem_post(philo->data->sem_dead);
+		sem_wait(philo->data->sem_dead);
+		if (philo->meals_tar >= 0 && philo->meals_tar == philo->meals_counter)
 		{
-			data->is_finished = true;
+			sem_post(philo->data->sem_finished);
 			break;
 		}
+		sem_post(philo->data->sem_dead);
 	}
-	if (data->is_dead)
-		exit(1);
-	else
-		exit(0);
+	return (NULL);
 }
 
-void	run_philo_sim(t_data *data)
+void	run_philo_sim(t_philo *philo)
 {
-	if (pthread_create(&data->monitor, NULL, &monitor_sim, (void *)data))
+	pthread_t	monitor;
+	if (pthread_create(&monitor, NULL, monitor_sim, (void *)philo))
 		print_error("Monitor thread create error");
-	//pthread_detach(data->monitor);
-	if (data->index % 2)
+	pthread_detach(monitor);
+	if (philo->index % 2)
 		usleep_updated(1000);
 	while (1)
 	{
-		eating(data);
-		sleeping(data);
-		thinking(data);
+		eating(philo);
+		sleeping(philo);
+		thinking(philo);
 	}
-	if (pthread_join(data->monitor, NULL))
-		print_error("Monitor thread join error");
+
 }
 
-void	init_sim(t_data *data)
+void	init_sim(t_data *data, t_philo *philo)
 {
 	int	i;
 
@@ -231,56 +230,81 @@ void	init_sim(t_data *data)
 	data->init_time = gettime(MILLISEC);
 	while (++i < data->philo_number)
 	{
-		data->pid[i] = fork();
-		if (data->pid[i] == -1)
+		philo[i].pid = fork();
+		if (philo[i].pid == -1)
 			print_error("Fork error");
-		if (data->pid[i] == 0)
+		if (philo[i].pid == 0)
 		{
-			data->index = i + 1;
-			data->last_meal = gettime(MILLISEC);
-			run_philo_sim(data);
+			philo[i].last_meal = gettime(MILLISEC);
+			run_philo_sim(&philo[i]);
 		}
 	}
 }
 
-void	free_data(t_data *data)
+void	free_data(t_data *data, t_philo *philo)
 {
 	int	i;
-	int	status;
+	//int	status;
 
 	i = -1;
 	while (++i < data->philo_number)
 	{
-		waitpid(-1, &status, 0);
-		if (status)
-		{
-			i = -1;
-			while (++i < data->philo_number)
-				kill(data->pid[i], SIGKILL);
-			break;
-		}
+		//waitpid(-1, &status, 0);
+		while (++i < data->philo_number)
+			kill(philo[i].pid, SIGKILL);
+
 	}
+	
+	sem_close(data->sem_finished);
+	sem_close(data->sem_dead);
 	sem_close(data->sem_print);
 	sem_close(data->sem_fork);
 	sem_unlink("/sem_print");
 	sem_unlink("/sem_fork");
-	free(data->pid);
-	free(data);
+
+}
+
+
+void	set_philo(t_philo **philo, t_data *data)
+{
+	int	i;
+
+	i = -1;
+	
+	while (++i < data->philo_number)
+	{
+		philo[i]->data = data;
+		philo[i]->meals_counter = 0;
+		philo[i]->last_meal = 0;
+		philo[i]->index = i + 1;
+		philo[i]->is_dead = false;
+		philo[i]->meals_tar = data->meals_target;
+		philo[i]->pid = -1;
+	}
 }
 
 int	main(int argc, char *argv[])
 {
-	t_data	*data;
+	t_data	*sim;
+	t_philo	*philo = NULL;
 
 	if (argc == 5 || argc == 6)
 	{
-		data = malloc(sizeof(t_data));
-		if (!data)
-			print_error("Malloc error");
-		parser(argv, &data);
-		set_data(data);
-		init_sim(data);
-		free_data(data);
+		sim = malloc(sizeof(t_data));
+		if (!sim)
+			print_error("sim malloc error");
+		parser(argv, &sim);
+		set_data(sim);
+		philo = malloc(sizeof(t_philo) * sim->philo_number);
+		if (!philo)
+			print_error("Philo malloc error");
+		
+		set_philo(&philo, sim);
+		printf("%ld\n", sim->philo_number);
+		sem_wait(sim->sem_finished);
+		init_sim(sim, philo);
+		sem_wait(sim->sem_finished);
+		free_data(sim, philo);
 	}
 	else
 		print_error("Wrong input");
