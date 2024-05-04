@@ -6,7 +6,7 @@
 /*   By: mmughedd <mmughedd@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/01 08:52:26 by mmughedd          #+#    #+#             */
-/*   Updated: 2024/05/04 08:44:03 by mmughedd         ###   ########.fr       */
+/*   Updated: 2024/05/04 13:43:30 by mmughedd         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -118,6 +118,7 @@ void	set_data(t_data *data)
 	data->init_time = 0;
 	data->is_running = 0;
 	data->is_finished = 0;
+	data->is_full_counter = data->philo_number;
 	sem_unlink("/sem_print");
 	sem_unlink("/sem_fork");
 	sem_unlink("/sem_finished");
@@ -126,6 +127,7 @@ void	set_data(t_data *data)
 	data->sem_fork = sem_open("/sem_fork",  O_CREAT, 0644, data->philo_number);
 	data->sem_finished = sem_open("/sem_finished", O_CREAT, 0644, 1);
 	data->sem_dead = sem_open("/sem_dead", O_CREAT, 0644, 1);
+	data->sem_full= sem_open("/sem_dead", O_CREAT, 0644, data->philo_number); //TODO:
 	if (!data->sem_print || !data->sem_fork || !data->sem_finished || !data->sem_dead)
 		print_error("Semaphore open error");
 }
@@ -146,7 +148,7 @@ void	print_status(int status, t_philo *philo)
 		printf("%6ld %d is thinking\n", time, philo->index);
 	else if (status == DEAD)
 		printf("%6ld %d died\n", time, philo->index);
-	if (status != DEAD)
+	if (status != DEAD || status != ALLFULL)
 		sem_post(philo->data->sem_print);
 }
 
@@ -188,7 +190,17 @@ void	thinking(t_philo *philo, bool for_desync)
 	usleep_updated(t_think * 0.3);
 }
 
+bool	check_sem_full(t_data *data)
+{
+	bool	all_full;
 
+	all_full = false;
+	sem_wait(data->sem_full);
+	if (data->is_full_counter == 0)
+		all_full = true;
+	sem_post(data->sem_full);
+	return (all_full);
+}
 void	*monitor_sim(void *v_philo)
 {
 	t_philo	*philo;
@@ -206,13 +218,21 @@ void	*monitor_sim(void *v_philo)
 			break;
 		}
 		sem_post(philo->data->sem_dead);
-		sem_wait(philo->data->sem_dead);
+		sem_wait(philo->data->sem_full);
 		if (philo->meals_target >= 0 && philo->meals_target == philo->meals_counter)
 		{
-			sem_post(philo->data->sem_finished);
+			philo->data->is_full_counter--;
+			printf("%ld\n", philo->data->is_full_counter);
+			if (!philo->data->is_full_counter)
+			{
+				print_status(ALLFULL, philo);
+				sem_post(philo->data->sem_finished);
+			}
+			sem_post(philo->data->sem_full);
 			break;
 		}
-		sem_post(philo->data->sem_dead);
+		else
+			sem_post(philo->data->sem_full);
 	}
 	return (NULL);
 }
@@ -235,9 +255,9 @@ void	run_philo_sim(t_philo *philo)
 {
 	pthread_t	monitor;
 
+	philo->last_meal = gettime(MILLISEC);
 	if (pthread_create(&monitor, NULL, monitor_sim, (void *)philo))
 		print_error("Monitor thread create error");
-	philo->last_meal = gettime(MILLISEC);
 	desynchronize_philos(philo);
 	while (1)
 	{
@@ -271,8 +291,7 @@ void	free_data(t_data *data, t_philo *philo)
 	i = -1;
 	while (++i < data->philo_number)
 	{
-		while (++i < data->philo_number)
-			kill(philo[i].pid, SIGKILL);
+		kill(philo[i].pid, SIGKILL);
 	}
 	sem_close(data->sem_finished);
 	sem_close(data->sem_dead);
