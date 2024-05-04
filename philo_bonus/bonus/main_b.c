@@ -6,7 +6,7 @@
 /*   By: mmughedd <mmughedd@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/01 08:52:26 by mmughedd          #+#    #+#             */
-/*   Updated: 2024/05/04 13:43:30 by mmughedd         ###   ########.fr       */
+/*   Updated: 2024/05/04 21:29:54 by mmughedd         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -127,8 +127,8 @@ void	set_data(t_data *data)
 	data->sem_fork = sem_open("/sem_fork",  O_CREAT, 0644, data->philo_number);
 	data->sem_finished = sem_open("/sem_finished", O_CREAT, 0644, 1);
 	data->sem_dead = sem_open("/sem_dead", O_CREAT, 0644, 1);
-	data->sem_full= sem_open("/sem_dead", O_CREAT, 0644, data->philo_number); //TODO:
-	if (!data->sem_print || !data->sem_fork || !data->sem_finished || !data->sem_dead)
+	data->sem_full= sem_open("/sem_dead", O_CREAT, 0644, data->philo_number);
+	if (!data->sem_print || !data->sem_fork || !data->sem_finished || !data->sem_dead || !data->sem_full)
 		print_error("Semaphore open error");
 }
 
@@ -221,8 +221,7 @@ void	*monitor_sim(void *v_philo)
 		sem_wait(philo->data->sem_full);
 		if (philo->meals_target >= 0 && philo->meals_target == philo->meals_counter)
 		{
-			philo->data->is_full_counter--;
-			printf("%ld\n", philo->data->is_full_counter);
+			philo->data->is_full_counter--;//TODO: sem wait
 			if (!philo->data->is_full_counter)
 			{
 				print_status(ALLFULL, philo);
