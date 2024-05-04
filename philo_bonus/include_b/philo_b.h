@@ -6,7 +6,7 @@
 /*   By: mmughedd <mmughedd@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/01 09:09:38 by mmughedd          #+#    #+#             */
-/*   Updated: 2024/05/03 13:57:37 by mmughedd         ###   ########.fr       */
+/*   Updated: 2024/05/04 08:34:03 by mmughedd         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,30 +35,26 @@
 # define SECOND_FORK 4
 # define DEAD 5
 
-typedef struct s_data	t_data;
 
-struct s_data
+typedef struct s_data
 {
 	long		philo_number;
 	long		time_to_die;
 	long		time_to_eat;
 	long		time_to_sleep;
-
 	long		meals_target;
 	long		init_time;
-
-
 	bool		is_running;
 	bool		is_finished;
 	sem_t		*sem_print;
 	sem_t		*sem_fork;
 	sem_t		*sem_finished;
 	sem_t		*sem_dead;
-};
+} t_data;
 
 typedef struct s_philo
 {
-	long		meals_tar;
+	long		meals_target;
 	long		last_meal;
 	int			index;
 	bool		is_dead;
@@ -66,6 +62,5 @@ typedef struct s_philo
 	t_data		*data;
 	pid_t		pid;
 } t_philo;
-
 
 #endif
