@@ -6,11 +6,11 @@
 #    By: mmughedd <mmughedd@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/03/11 12:38:07 by mmughedd          #+#    #+#              #
-#    Updated: 2024/05/04 13:34:08 by mmughedd         ###   ########.fr        #
+#    Updated: 2024/05/05 08:50:12 by mmughedd         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-BONUS = main_b.c
+BONUS = main_b.c actions.c bools_set.c time.c utils.c utils2.c
 
 BONUS_PATH = bonus/
 

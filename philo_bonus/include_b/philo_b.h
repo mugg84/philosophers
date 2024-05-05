@@ -6,7 +6,7 @@
 /*   By: mmughedd <mmughedd@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/01 09:09:38 by mmughedd          #+#    #+#             */
-/*   Updated: 2024/05/04 10:25:15 by mmughedd         ###   ########.fr       */
+/*   Updated: 2024/05/05 08:32:49 by mmughedd         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,8 +34,6 @@
 # define FIRST_FORK 3
 # define SECOND_FORK 4
 # define DEAD 5
-# define ALLFULL 6
-
 
 typedef struct s_data
 {
@@ -51,8 +49,9 @@ typedef struct s_data
 	sem_t		*sem_print;
 	sem_t		*sem_fork;
 	sem_t		*sem_finished;
-	sem_t		*sem_dead;
-	sem_t		*sem_full;
+	sem_t		*sem_last_meal;
+	sem_t		*sem_meal_counter;
+
 } t_data;
 
 typedef struct s_philo
@@ -61,9 +60,32 @@ typedef struct s_philo
 	long		last_meal;
 	int			index;
 	bool		is_dead;
+	bool		is_finished;
 	long		meals_counter;
 	t_data		*data;
 	pid_t		pid;
 } t_philo;
+
+char	*check_input(char *n);
+void	parser(char *argv[], t_data **data);
+void	eating(t_philo *philo);
+void	sleeping(t_philo *philo);
+void	thinking(t_philo *philo, bool for_desync);
+void	set_last_meal(t_philo *philo);
+void	set_meal_counter(t_philo *philo);
+void	set_data(t_data *data);
+void	set_philo(t_philo **philo, t_data *data);
+void	usleep_updated(long usec);
+void	desynchronize_philos(t_philo *philo);
+void	free_data(t_data *data, t_philo *philo);
+void	kill_processes(t_data *data, t_philo *philo);
+void	print_error(char *err);
+void	print_status(int status, t_philo *philo);
+bool	is_dead(t_philo *philo);
+bool	is_full(t_philo *philo);
+long	gettime(int time);
+long	ft_atol(char *n);
+
+
 
 #endif
