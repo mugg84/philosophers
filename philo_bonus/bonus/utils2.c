@@ -6,7 +6,7 @@
 /*   By: mmughedd <mmughedd@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/05 08:27:57 by mmughedd          #+#    #+#             */
-/*   Updated: 2024/05/05 08:28:22 by mmughedd         ###   ########.fr       */
+/*   Updated: 2024/05/05 13:09:29 by mmughedd         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,20 +35,18 @@ void	print_status(int status, t_philo *philo)
 
 	time = gettime(MILLISEC) - philo->data->init_time;
 	sem_wait(philo->data->sem_print);
-	if ((status == FIRST_FORK || status == SECOND_FORK))
+	if ((status == FIRST_FORK || status == SECOND_FORK) && !is_dead(philo))
 		printf("%6ld %d has taken a fork\n", time, philo->index);
-	if (status == EATING)
+	if (status == EATING && !is_dead(philo))
 		printf("%6ld %d is eating\n", time, philo->index);
-	else if (status == SLEEPING)
+	else if (status == SLEEPING && !is_dead(philo))
 		printf("%6ld %d is sleeping\n", time, philo->index);
-	else if (status == THINKING)
+	else if (status == THINKING && !is_dead(philo))
 		printf("%6ld %d is thinking\n", time, philo->index);
 	else if (status == DEAD)
 		printf("%6ld %d died\n", time, philo->index);
-	if (status != DEAD)
-		sem_post(philo->data->sem_print);
+	sem_post(philo->data->sem_print);
 }
-
 
 void	set_philo(t_philo **philo, t_data *data)
 {

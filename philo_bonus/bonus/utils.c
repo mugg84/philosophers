@@ -6,7 +6,7 @@
 /*   By: mmughedd <mmughedd@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/05 08:23:52 by mmughedd          #+#    #+#             */
-/*   Updated: 2024/05/05 08:49:45 by mmughedd         ###   ########.fr       */
+/*   Updated: 2024/05/05 13:36:34 by mmughedd         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,6 +69,7 @@ void	kill_processes(t_data *data, t_philo *philo)
 	while (++i < data->philo_number)
 	{
 		waitpid(-1, &status, 0);
+		printf("%d\n", status);
 		if (status != 0)
 		{
 			i = -1;

@@ -6,7 +6,7 @@
 /*   By: mmughedd <mmughedd@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/01 08:52:26 by mmughedd          #+#    #+#             */
-/*   Updated: 2024/05/05 08:50:32 by mmughedd         ###   ########.fr       */
+/*   Updated: 2024/05/05 13:11:01 by mmughedd         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,10 +14,6 @@
 
 void	set_data(t_data *data)
 {
-	data->init_time = 0;
-	data->is_running = 0;
-	data->is_finished = 0;
-	data->is_full_counter = data->philo_number;
 	sem_unlink("/sem_print");
 	sem_unlink("/sem_fork");
 	sem_unlink("/sem_finished");
@@ -40,24 +36,25 @@ void	*monitor_sim(void *v_philo)
 	philo = (t_philo *)v_philo;
 	while (!philo->is_finished)
 	{
-		usleep_updated(100);
 		if (is_dead(philo))
 		{
-			print_status(DEAD, philo);
-			sem_post(philo->data->sem_finished);
+
 			philo->is_dead = true;
+			sem_post(philo->data->sem_finished);
+			print_status(DEAD, philo);
 			break;
 		}
 		if (is_full(philo))
 		{
-			philo->is_finished =true;
+			//print_status(FULL, philo);
+			sem_post(philo->data->sem_finished);
 			break;
 		}
 	}
-	if (philo->is_dead)
-		exit(1);
-	else
-		exit(0);
+	// if (is_dead(philo))
+	// 	exit(1);
+	// else
+	// 	exit(0);
 	return (NULL);
 }
 
@@ -71,13 +68,17 @@ void	run_philo_sim(t_philo *philo)
 	if (pthread_create(&monitor, NULL, monitor_sim, (void *)philo))
 		print_error("Monitor thread create error");
 	desynchronize_philos(philo);
-	while (1)
+	while (!is_dead(philo) && !is_full(philo))
 	{
 		eating(philo);
 		sleeping(philo);
 		thinking(philo, false);
 	}
 	pthread_join(monitor, NULL);
+	if (is_dead(philo))
+		exit(1);
+	else
+		exit(0);
 }
 
 void	init_sim(t_data *data, t_philo *philo)
