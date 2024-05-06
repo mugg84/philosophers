@@ -6,7 +6,7 @@
 /*   By: mmughedd <mmughedd@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/01 08:52:26 by mmughedd          #+#    #+#             */
-/*   Updated: 2024/05/05 13:11:01 by mmughedd         ###   ########.fr       */
+/*   Updated: 2024/05/06 12:58:19 by mmughedd         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,11 +20,11 @@ void	set_data(t_data *data)
 	sem_unlink("/sem_last_meal");
 	sem_unlink("/sem_meal_counter");
 	data->sem_print = sem_open("/sem_print", O_CREAT, 0644, 1);
-	data->sem_fork = sem_open("/sem_fork",  O_CREAT, 0644, data->philo_number);
+	data->sem_fork = sem_open("/sem_fork", O_CREAT, 0644, data->philo_number);
 	data->sem_finished = sem_open("/sem_finished", O_CREAT, 0644, 1);
-	data->sem_last_meal= sem_open("/sem_last_meal", O_CREAT, 0644, 1);
+	data->sem_last_meal = sem_open("/sem_last_meal", O_CREAT, 0644, 1);
 	data->sem_meal_counter = sem_open("/sem_meal_counter", O_CREAT, 0644, 1);
-	if (!data->sem_print || !data->sem_fork || !data->sem_finished 
+	if (!data->sem_print || !data->sem_fork || !data->sem_finished
 		|| !data->sem_last_meal || !data->sem_meal_counter)
 		print_error("Semaphore open error");
 }
@@ -32,29 +32,27 @@ void	set_data(t_data *data)
 void	*monitor_sim(void *v_philo)
 {
 	t_philo	*philo;
-	
-	philo = (t_philo *)v_philo;
-	while (!philo->is_finished)
-	{
-		if (is_dead(philo))
-		{
 
-			philo->is_dead = true;
-			sem_post(philo->data->sem_finished);
+	philo = (t_philo *)v_philo;
+	while (!is_finished(philo))
+	{
+		if (check_is_dead(philo))
+		{
+			set_is_dead(philo);
 			print_status(DEAD, philo);
-			break;
+			set_is_finished(philo);
+			break ;
 		}
 		if (is_full(philo))
 		{
-			//print_status(FULL, philo);
-			sem_post(philo->data->sem_finished);
-			break;
+			set_is_finished(philo);
+			break ;
 		}
 	}
-	// if (is_dead(philo))
-	// 	exit(1);
-	// else
-	// 	exit(0);
+	if (is_dead(philo))
+		exit(1);
+	else
+		exit(0);
 	return (NULL);
 }
 
@@ -68,17 +66,13 @@ void	run_philo_sim(t_philo *philo)
 	if (pthread_create(&monitor, NULL, monitor_sim, (void *)philo))
 		print_error("Monitor thread create error");
 	desynchronize_philos(philo);
-	while (!is_dead(philo) && !is_full(philo))
+	while (!is_finished(philo))
 	{
 		eating(philo);
 		sleeping(philo);
 		thinking(philo, false);
 	}
 	pthread_join(monitor, NULL);
-	if (is_dead(philo))
-		exit(1);
-	else
-		exit(0);
 }
 
 void	init_sim(t_data *data, t_philo *philo)
@@ -100,7 +94,7 @@ void	init_sim(t_data *data, t_philo *philo)
 int	main(int argc, char *argv[])
 {
 	t_data	*data;
-	t_philo	*philo = NULL;
+	t_philo	*philo;
 
 	if (argc == 5 || argc == 6)
 	{

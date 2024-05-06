@@ -6,7 +6,7 @@
 /*   By: mmughedd <mmughedd@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/11 09:26:10 by mmughedd          #+#    #+#             */
-/*   Updated: 2024/05/03 13:09:14 by mmughedd         ###   ########.fr       */
+/*   Updated: 2024/05/06 12:53:23 by mmughedd         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@ void	parser(char *argv[], t_data **data)
 	(*data)->time_to_die = ft_atol(argv[2]) * 1000;
 	(*data)->time_to_eat = ft_atol(argv[3]) * 1000;
 	(*data)->time_to_sleep = ft_atol(argv[4]) * 1000;
-	if ((*data)->time_to_die < 6000
+	if ((*data)->time_to_die < 60000
 		|| (*data)->time_to_eat < 60000 || (*data)->time_to_sleep < 60000)
 		print_error("Inputs bigger than 60 milliseconds");
 	else if ((*data)->philo_number == 0)

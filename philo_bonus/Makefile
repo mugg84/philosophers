@@ -6,11 +6,11 @@
 #    By: mmughedd <mmughedd@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/03/11 12:38:07 by mmughedd          #+#    #+#              #
-#    Updated: 2024/05/05 08:50:12 by mmughedd         ###   ########.fr        #
+#    Updated: 2024/05/06 12:18:29 by mmughedd         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-BONUS = main_b.c actions.c bools_set.c time.c utils.c utils2.c
+BONUS = main_b.c actions.c bools_set.c time.c utils.c utils2.c setters.c
 
 BONUS_PATH = bonus/
 
@@ -26,7 +26,7 @@ CC = cc
 
 RM = rm -f
 
-FLAGS = -g -Wextra -Werror -Wall #-fsanitize=thread
+FLAGS = -g -Wextra -Werror -Wall -fsanitize=thread
 
 %.o: %.c
 	$(CC) $(FLAGS) -c $< -o $@ $(INC_B)

@@ -6,7 +6,7 @@
 /*   By: mmughedd <mmughedd@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/01 09:09:38 by mmughedd          #+#    #+#             */
-/*   Updated: 2024/05/05 13:12:06 by mmughedd         ###   ########.fr       */
+/*   Updated: 2024/05/06 12:38:55 by mmughedd         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,6 @@
 # define FIRST_FORK 3
 # define SECOND_FORK 4
 # define DEAD 5
-# define FULL 6
 
 typedef struct s_data
 {
@@ -50,7 +49,7 @@ typedef struct s_data
 	sem_t		*sem_last_meal;
 	sem_t		*sem_meal_counter;
 
-} t_data;
+}	t_data;
 
 typedef struct s_philo
 {
@@ -62,7 +61,7 @@ typedef struct s_philo
 	long		meals_counter;
 	t_data		*data;
 	pid_t		pid;
-} t_philo;
+}	t_philo;
 
 char	*check_input(char *n);
 void	parser(char *argv[], t_data **data);
@@ -79,11 +78,13 @@ void	free_data(t_data *data, t_philo *philo);
 void	kill_processes(t_data *data, t_philo *philo);
 void	print_error(char *err);
 void	print_status(int status, t_philo *philo);
+void	set_is_finished(t_philo *philo);
+void	set_is_dead(t_philo *philo);
+bool	is_finished(t_philo *philo);
+bool	check_is_dead(t_philo *philo);
 bool	is_dead(t_philo *philo);
 bool	is_full(t_philo *philo);
 long	gettime(int time);
 long	ft_atol(char *n);
-
-
 
 #endif

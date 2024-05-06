@@ -6,7 +6,7 @@
 #    By: mmughedd <mmughedd@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/03/11 12:38:07 by mmughedd          #+#    #+#              #
-#    Updated: 2024/05/02 06:12:15 by mmughedd         ###   ########.fr        #
+#    Updated: 2024/05/06 11:04:54 by mmughedd         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -26,7 +26,7 @@ CC = cc
 
 RM = rm -f
 
-FLAGS = -g -Wextra -Werror -Wall #-fsanitize=thread
+FLAGS = -g -Wextra -Werror -Wall -fsanitize=thread
 
 %.o: %.c
 	$(CC) $(FLAGS) -c $< -o $@ $(INC)

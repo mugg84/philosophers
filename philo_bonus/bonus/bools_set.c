@@ -6,7 +6,7 @@
 /*   By: mmughedd <mmughedd@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/05 08:18:35 by mmughedd          #+#    #+#             */
-/*   Updated: 2024/05/05 08:47:39 by mmughedd         ###   ########.fr       */
+/*   Updated: 2024/05/06 12:20:24 by mmughedd         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,40 +14,50 @@
 
 bool	is_dead(t_philo *philo)
 {
+	bool	is_dead;
+
+	is_dead = false;
+	sem_wait(philo->data->sem_last_meal);
+	if (philo->is_dead)
+		is_dead = true;
+	sem_post(philo->data->sem_last_meal);
+	return (is_dead);
+}
+
+bool	check_is_dead(t_philo *philo)
+{
 	long	time;
 	bool	is_dead;
 
-	is_dead =false;
+	is_dead = false;
 	sem_wait(philo->data->sem_last_meal);
 	time = gettime(MILLISEC);
 	if (time - philo->last_meal >= philo->data->time_to_die / 1000)
-		is_dead=true;
+		is_dead = true;
 	sem_post(philo->data->sem_last_meal);
-	return(is_dead);
+	return (is_dead);
 }
 
 bool	is_full(t_philo *philo)
 {
 	bool	is_full;
 
-	is_full =false;
+	is_full = false;
 	sem_wait(philo->data->sem_meal_counter);
 	if (philo->meals_target >= 0 && philo->meals_target == philo->meals_counter)
 		is_full = true;
 	sem_post(philo->data->sem_meal_counter);
-	return(is_full);
+	return (is_full);
 }
 
-void	set_last_meal(t_philo *philo)
+bool	is_finished(t_philo *philo)
 {
-	sem_wait(philo->data->sem_last_meal);
-	philo->last_meal = gettime(MILLISEC);
-	sem_post(philo->data->sem_last_meal);
-}
+	bool	is_finished;
 
-void	set_meal_counter(t_philo *philo)
-{
-	sem_wait(philo->data->sem_meal_counter);
-	philo->meals_counter++;
-	sem_post(philo->data->sem_meal_counter);
+	is_finished = false;
+	sem_wait(philo->data->sem_finished);
+	if (philo->is_finished)
+		is_finished = true;
+	sem_post(philo->data->sem_finished);
+	return (is_finished);
 }

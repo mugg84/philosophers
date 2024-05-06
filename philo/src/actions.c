@@ -6,7 +6,7 @@
 /*   By: mmughedd <mmughedd@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/30 11:52:00 by mmughedd          #+#    #+#             */
-/*   Updated: 2024/04/30 13:29:18 by mmughedd         ###   ########.fr       */
+/*   Updated: 2024/05/06 12:49:24 by mmughedd         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,5 +56,5 @@ void	thinking(t_philo *philo, bool for_desync)
 	t_think = (t_eat * 2) - t_sleep;
 	if (t_think < 0)
 		t_think = 0;
-	usleep_updated(t_think * 0.3, philo->data);
+	usleep_updated(t_think * 0.42, philo->data);
 }
