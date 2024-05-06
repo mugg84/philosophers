@@ -70,7 +70,7 @@ void	sleeping(t_philo *philo);
 void	thinking(t_philo *philo, bool for_desync);
 void	set_last_meal(t_philo *philo);
 void	set_meal_counter(t_philo *philo);
-void	set_data(t_data *data);
+void	set_semaphores(t_data *data);
 void	set_philo(t_philo **philo, t_data *data);
 void	usleep_updated(long usec);
 void	desynchronize_philos(t_philo *philo);

@@ -12,6 +12,14 @@
 
 #include "philo_b.h"
 
+/* Checks philo structure is_dead flag
+ * 
+ * Arguments:
+ * - philo structure
+ * 
+ * Returns:
+ * - True if is_dead, false otherwhise
+ */
 bool	is_dead(t_philo *philo)
 {
 	bool	is_dead;
@@ -24,6 +32,15 @@ bool	is_dead(t_philo *philo)
 	return (is_dead);
 }
 
+/* Calculates if time since last meal is bigger than time_to_die
+ * and if so sets the is_dead flag to true
+ * 
+ * Arguments:
+ * - philo structure
+ * 
+ * Returns:
+ * - True if is_dead, false otherwhise
+ */
 bool	check_is_dead(t_philo *philo)
 {
 	long	time;
@@ -38,6 +55,14 @@ bool	check_is_dead(t_philo *philo)
 	return (is_dead);
 }
 
+/* Checks philo structure is_full flag
+ * 
+ * Arguments:
+ * - philo structure
+ * 
+ * Returns:
+ * - True if is_full, false otherwhise
+ */
 bool	is_full(t_philo *philo)
 {
 	bool	is_full;
@@ -50,6 +75,14 @@ bool	is_full(t_philo *philo)
 	return (is_full);
 }
 
+/* Checks philo structure is_finished flag
+ * 
+ * Arguments:
+ * - philo structure
+ * 
+ * Returns:
+ * - True if is_finished, false otherwhise
+ */
 bool	is_finished(t_philo *philo)
 {
 	bool	is_finished;

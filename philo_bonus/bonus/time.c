@@ -12,6 +12,14 @@
 
 #include "philo_b.h"
 
+/* Gets the time
+
+ * Arguments:
+ * - Time flag - milliseconds or microsecond
+ * 
+ * Returns:
+ * - Time in format requested on success, EXIT_FAILURE otherwise
+ */
 long	gettime(int time)
 {
 	struct timeval	tv;
@@ -27,6 +35,14 @@ long	gettime(int time)
 	return (EXIT_FAILURE);
 }
 
+/* More precise versione of function usleep()
+
+ * Arguments:
+ * - Usec - time to wait
+ * 
+ * Returns:
+ * - Nothing
+ */
 void	usleep_updated(long usec)
 {
 	long	start;
@@ -48,6 +64,14 @@ void	usleep_updated(long usec)
 	}
 }
 
+/* Descynchronize philos, depending on total number and if ID odd or even
+
+ * Arguments:
+ * - Philo struct
+ * 
+ * Returns:
+ * - Nothing
+ */
 void	desynchronize_philos(t_philo *philo)
 {
 	if (philo->data->philo_number % 2 == 0)

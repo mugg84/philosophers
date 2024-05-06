@@ -12,6 +12,14 @@
 
 #include "philo_b.h"
 
+/* Sets last_meal
+ * 
+ * Arguments:
+ * - philo structure
+ * 
+ * Returns:
+ * - Nothing
+ */
 void	set_last_meal(t_philo *philo)
 {
 	sem_wait(philo->data->sem_last_meal);
@@ -19,6 +27,14 @@ void	set_last_meal(t_philo *philo)
 	sem_post(philo->data->sem_last_meal);
 }
 
+/* Sets meal_counter
+ * 
+ * Arguments:
+ * - philo structure
+ * 
+ * Returns:
+ * - Nothing
+ */
 void	set_meal_counter(t_philo *philo)
 {
 	sem_wait(philo->data->sem_meal_counter);
@@ -26,6 +42,14 @@ void	set_meal_counter(t_philo *philo)
 	sem_post(philo->data->sem_meal_counter);
 }
 
+/* Sets is_finished flag
+ * 
+ * Arguments:
+ * - philo structure
+ * 
+ * Returns:
+ * - Nothing
+ */
 void	set_is_finished(t_philo *philo)
 {
 	sem_wait(philo->data->sem_finished);
@@ -33,6 +57,14 @@ void	set_is_finished(t_philo *philo)
 	sem_post(philo->data->sem_finished);
 }
 
+/* Sets is_dead flag
+ * 
+ * Arguments:
+ * - philo structure
+ * 
+ * Returns:
+ * - Nothing
+ */
 void	set_is_dead(t_philo *philo)
 {
 	sem_wait(philo->data->sem_last_meal);

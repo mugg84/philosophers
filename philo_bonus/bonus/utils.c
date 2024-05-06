@@ -12,12 +12,28 @@
 
 #include "philo_b.h"
 
+/* Prints error and exits the processs
+
+ * Arguments:
+ * - Err - error text
+ * 
+ * Returns:
+ * - Nothing
+ */
 void	print_error(char *err)
 {
 	printf("%s\n", err);
 	exit(EXIT_FAILURE);
 }
 
+/* Same as atoi(), but for long int
+
+ * Arguments:
+ * - N - string to be converted to long int
+ * 
+ * Returns:
+ * - Long int
+ */
 long	ft_atol(char *n)
 {
 	long	res;
@@ -35,6 +51,14 @@ long	ft_atol(char *n)
 	return (res);
 }
 
+/* Checks if string to be converted is a positive int and skips initial spaces
+
+ * Arguments:
+ * - N - string to be converted to long int
+ * 
+ * Returns:
+ * - String of number characters
+ */
 char	*check_input(char *n)
 {
 	int		len;
@@ -60,6 +84,15 @@ char	*check_input(char *n)
 	return (res);
 }
 
+/* Waits for processes and kills all if one process is_dead flag is true
+
+ * Arguments:
+ * - Data struct
+ * - Philo struct
+ * 
+ * Returns:
+ * - Nothing
+ */
 void	kill_processes(t_data *data, t_philo *philo)
 {
 	int	i;
@@ -79,6 +112,15 @@ void	kill_processes(t_data *data, t_philo *philo)
 	}
 }
 
+/* Closes processes, semaphores and frees structures
+
+ * Arguments:
+ * - Data struct
+ * - Philo struct
+ * 
+ * Returns:
+ * - Nothing
+ */
 void	free_data(t_data *data, t_philo *philo)
 {
 	kill_processes(data, philo);

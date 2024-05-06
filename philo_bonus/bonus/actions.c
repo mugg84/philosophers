@@ -12,6 +12,14 @@
 
 #include "philo_b.h"
 
+/* Handles eating action
+ * 
+ * Arguments:
+ * - philo structure
+ * 
+ * Returns:
+ * - Nothing
+ */
 void	eating(t_philo *philo)
 {
 	sem_wait(philo->data->sem_fork);
@@ -26,12 +34,28 @@ void	eating(t_philo *philo)
 	sem_post(philo->data->sem_fork);
 }
 
+/* Handles sleeping action
+ * 
+ * Arguments:
+ * - philo structure
+ * 
+ * Returns:
+ * - Nothing
+ */
 void	sleeping(t_philo *philo)
 {
 	print_status(SLEEPING, philo);
 	usleep_updated(philo->data->time_to_sleep);
 }
 
+/* Handles thinking action
+ * 
+ * Arguments:
+ * - philo structure
+ * 
+ * Returns:
+ * - Nothing
+ */
 void	thinking(t_philo *philo, bool for_desync)
 {
 	long	t_eat;

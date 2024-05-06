@@ -12,6 +12,15 @@
 
 #include "philo_b.h"
 
+/* Parses the args and if valid, it assigns them to data structure
+
+ * Arguments:
+ * - Argv strings
+ * - Data struct
+ * 
+ * Returns:
+ * - Nothing
+ */
 void	parser(char *argv[], t_data **data)
 {
 	(*data)->philo_number = ft_atol(argv[1]);
@@ -29,6 +38,15 @@ void	parser(char *argv[], t_data **data)
 		(*data)->meals_target = -1;
 }
 
+/* Prints the status provided with timestamp
+
+ * Arguments:
+ * - Status
+ * - Philo struct
+ * 
+ * Returns:
+ * - Nothing
+ */
 void	print_status(int status, t_philo *philo)
 {
 	long	time;
@@ -49,6 +67,15 @@ void	print_status(int status, t_philo *philo)
 		sem_post(philo->data->sem_print);
 }
 
+/* Assigns philo flags
+
+ * Arguments:
+ * - Philo struct
+ * - Data struct
+ * 
+ * Returns:
+ * - Nothing
+ */
 void	set_philo(t_philo **philo, t_data *data)
 {
 	int	i;

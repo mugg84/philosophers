@@ -26,7 +26,7 @@ CC = cc
 
 RM = rm -f
 
-FLAGS = -g -Wextra -Werror -Wall -fsanitize=thread
+FLAGS = -g -Wextra -Werror -Wall
 
 %.o: %.c
 	$(CC) $(FLAGS) -c $< -o $@ $(INC_B)

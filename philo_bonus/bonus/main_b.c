@@ -12,7 +12,15 @@
 
 #include "../include_b/philo_b.h"
 
-void	set_data(t_data *data)
+/* Opens semaphores in data structure
+ * 
+ * Arguments:
+ * - data structure
+ * 
+ * Returns:
+ * - Nothing
+ */
+void	set_semaphores(t_data *data)
 {
 	sem_unlink("/sem_print");
 	sem_unlink("/sem_fork");
@@ -29,6 +37,14 @@ void	set_data(t_data *data)
 		print_error("Semaphore open error");
 }
 
+/* Monitor a philo structure for death and meals target
+ * 
+ * Arguments:
+ * - philo structure
+ * 
+ * Returns:
+ * - Nothing
+ */
 void	*monitor_sim(void *v_philo)
 {
 	t_philo	*philo;
@@ -56,6 +72,14 @@ void	*monitor_sim(void *v_philo)
 	return (NULL);
 }
 
+/* Runs the simultion for a philo process
+ * 
+ * Arguments:
+ * - philo structure
+ * 
+ * Returns:
+ * - Nothing
+ */
 void	run_philo_sim(t_philo *philo)
 {
 	pthread_t	monitor;
@@ -65,6 +89,8 @@ void	run_philo_sim(t_philo *philo)
 	sem_post(philo->data->sem_last_meal);
 	if (pthread_create(&monitor, NULL, monitor_sim, (void *)philo))
 		print_error("Monitor thread create error");
+	if (pthread_detach(monitor))
+		print_error("Error detaching monitor thread");
 	desynchronize_philos(philo);
 	while (!is_finished(philo))
 	{
@@ -72,9 +98,17 @@ void	run_philo_sim(t_philo *philo)
 		sleeping(philo);
 		thinking(philo, false);
 	}
-	pthread_join(monitor, NULL);
 }
 
+/* Initiate the simulation, creates all philo processes
+ * 
+ * Arguments:
+ * - data structure
+ * - philo structure
+ * 
+ * Returns:
+ * - Nothing
+ */
 void	init_sim(t_data *data, t_philo *philo)
 {
 	int	i;
@@ -91,6 +125,15 @@ void	init_sim(t_data *data, t_philo *philo)
 	}
 }
 
+/* Checks the number of arguments and runs the simulation
+ * 
+ * Arguments:
+ * - number of arguments
+ * - arguments
+ * 
+ * Returns:
+ * - 0 on success, 1 if error
+ */
 int	main(int argc, char *argv[])
 {
 	t_data	*data;
@@ -102,7 +145,7 @@ int	main(int argc, char *argv[])
 		if (!data)
 			print_error("data malloc error");
 		parser(argv, &data);
-		set_data(data);
+		set_semaphores(data);
 		philo = malloc(sizeof(t_philo) * data->philo_number);
 		if (!philo)
 			print_error("Philo malloc error");
