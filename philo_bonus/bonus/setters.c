@@ -6,7 +6,7 @@
 /*   By: mmughedd <mmughedd@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/06 12:18:15 by mmughedd          #+#    #+#             */
-/*   Updated: 2024/05/06 12:38:23 by mmughedd         ###   ########.fr       */
+/*   Updated: 2024/05/07 07:02:09 by mmughedd         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 /* Sets last_meal
  * 
  * Arguments:
- * - philo structure
+ * - Philo structure
  * 
  * Returns:
  * - Nothing
@@ -30,7 +30,7 @@ void	set_last_meal(t_philo *philo)
 /* Sets meal_counter
  * 
  * Arguments:
- * - philo structure
+ * - Philo structure
  * 
  * Returns:
  * - Nothing
@@ -45,7 +45,7 @@ void	set_meal_counter(t_philo *philo)
 /* Sets is_finished flag
  * 
  * Arguments:
- * - philo structure
+ * - Philo structure
  * 
  * Returns:
  * - Nothing
@@ -60,7 +60,7 @@ void	set_is_finished(t_philo *philo)
 /* Sets is_dead flag
  * 
  * Arguments:
- * - philo structure
+ * - Philo structure
  * 
  * Returns:
  * - Nothing

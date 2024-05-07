@@ -6,16 +6,16 @@
 /*   By: mmughedd <mmughedd@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/05 08:19:02 by mmughedd          #+#    #+#             */
-/*   Updated: 2024/05/06 12:19:21 by mmughedd         ###   ########.fr       */
+/*   Updated: 2024/05/07 07:02:09 by mmughedd         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo_b.h"
 
-/* Handles eating action
+/* Takes two forks, eating, put back forks
  * 
  * Arguments:
- * - philo structure
+ * - Philo structure
  * 
  * Returns:
  * - Nothing
@@ -34,10 +34,10 @@ void	eating(t_philo *philo)
 	sem_post(philo->data->sem_fork);
 }
 
-/* Handles sleeping action
+/* Prints sleep status and waits
  * 
  * Arguments:
- * - philo structure
+ * - Philo structure
  * 
  * Returns:
  * - Nothing
@@ -51,7 +51,8 @@ void	sleeping(t_philo *philo)
 /* Handles thinking action
  * 
  * Arguments:
- * - philo structure
+ * - Philo structure
+ * - For_desync - flag for thinking action or desync philosphers
  * 
  * Returns:
  * - Nothing

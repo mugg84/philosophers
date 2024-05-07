@@ -6,12 +6,20 @@
 /*   By: mmughedd <mmughedd@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/30 11:48:21 by mmughedd          #+#    #+#             */
-/*   Updated: 2024/04/30 13:28:15 by mmughedd         ###   ########.fr       */
+/*   Updated: 2024/05/07 07:01:12 by mmughedd         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
+/* Gets the time
+
+ * Arguments:
+ * - Time flag - milliseconds or microsecond
+ * 
+ * Returns:
+ * - Time in format requested on success, EXIT_FAILURE otherwise
+ */
 long	gettime(int time)
 {
 	struct timeval	tv;
@@ -29,6 +37,14 @@ long	gettime(int time)
 	return (EXIT_FAILURE);
 }
 
+/* More precise versione of function usleep()
+
+ * Arguments:
+ * - Usec - time to wait
+ * 
+ * Returns:
+ * - Nothing
+ */
 void	usleep_updated(long usec, t_data *data)
 {
 	long	start;
@@ -52,6 +68,14 @@ void	usleep_updated(long usec, t_data *data)
 	}
 }
 
+/* Descynchronize philos, depending on total number and if ID odd or even
+
+ * Arguments:
+ * - Philo struct
+ * 
+ * Returns:
+ * - Nothing
+ */
 void	desynchronize_philos(t_philo *philo)
 {
 	if (philo->data->philo_number % 2 == 0)

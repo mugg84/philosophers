@@ -6,18 +6,35 @@
 /*   By: mmughedd <mmughedd@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/30 11:49:35 by mmughedd          #+#    #+#             */
-/*   Updated: 2024/04/30 12:59:11 by mmughedd         ###   ########.fr       */
+/*   Updated: 2024/05/07 07:00:40 by mmughedd         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
+/* Prints error and exits the processs
+
+ * Arguments:
+ * - Err - error text
+ * 
+ * Returns:
+ * - Nothing
+ */
 void	print_error(char *err)
 {
 	printf("%s\n", err);
 	exit(EXIT_FAILURE);
 }
 
+/* Prints the status provided with timestamp
+
+ * Arguments:
+ * - Status
+ * - Philo struct
+ * 
+ * Returns:
+ * - Nothing
+ */
 void	print_status(int status, t_philo *philo)
 {
 	long	time;

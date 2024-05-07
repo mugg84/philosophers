@@ -6,12 +6,22 @@
 /*   By: mmughedd <mmughedd@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/30 11:54:30 by mmughedd          #+#    #+#             */
-/*   Updated: 2024/04/30 12:51:40 by mmughedd         ###   ########.fr       */
+/*   Updated: 2024/05/07 07:05:59 by mmughedd         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
+/* Sets forks pointers
+ * 
+ * Arguments:
+ * - Philo structure
+ * - Data structure
+ * - I : index
+ * 
+ * Returns:
+ * - Nothing
+ */
 void	set_philo_forks(t_philo *philo, t_data *data, int i)
 {
 	philo->first_fork = &data->forks[(i + 1) % data->philo_number];
@@ -23,6 +33,14 @@ void	set_philo_forks(t_philo *philo, t_data *data, int i)
 	}
 }
 
+/* Sets philo data members
+ * 
+ * Arguments:
+ * - Data structure
+ * 
+ * Returns:
+ * - Nothing
+ */
 void	philo_init(t_data *data)
 {
 	int		i;
@@ -42,6 +60,14 @@ void	philo_init(t_data *data)
 	}
 }
 
+/* Handles one philosopher case
+ * 
+ * Arguments:
+ * - Philo structure
+ * 
+ * Returns:
+ * - NULL
+ */
 void	*one_philo(void *v_philo)
 {
 	t_philo	*philo;
@@ -58,6 +84,14 @@ void	*one_philo(void *v_philo)
 	return (NULL);
 }
 
+/* Waits for all threads to run and monitors them
+ * 
+ * Arguments:
+ * - V_data structure
+ * 
+ * Returns:
+ * - NULL
+ */
 void	*philo_monitor(void *v_data)
 {
 	t_data	*data;

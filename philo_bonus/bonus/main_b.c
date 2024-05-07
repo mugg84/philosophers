@@ -6,7 +6,7 @@
 /*   By: mmughedd <mmughedd@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/01 08:52:26 by mmughedd          #+#    #+#             */
-/*   Updated: 2024/05/06 12:58:19 by mmughedd         ###   ########.fr       */
+/*   Updated: 2024/05/07 07:02:21 by mmughedd         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 /* Opens semaphores in data structure
  * 
  * Arguments:
- * - data structure
+ * - Data structure
  * 
  * Returns:
  * - Nothing
@@ -40,7 +40,7 @@ void	set_semaphores(t_data *data)
 /* Monitor a philo structure for death and meals target
  * 
  * Arguments:
- * - philo structure
+ * - Philo structure
  * 
  * Returns:
  * - Nothing
@@ -75,7 +75,7 @@ void	*monitor_sim(void *v_philo)
 /* Runs the simultion for a philo process
  * 
  * Arguments:
- * - philo structure
+ * - Philo structure
  * 
  * Returns:
  * - Nothing
@@ -103,8 +103,8 @@ void	run_philo_sim(t_philo *philo)
 /* Initiate the simulation, creates all philo processes
  * 
  * Arguments:
- * - data structure
- * - philo structure
+ * - Data structure
+ * - Philo structure
  * 
  * Returns:
  * - Nothing
@@ -128,8 +128,8 @@ void	init_sim(t_data *data, t_philo *philo)
 /* Checks the number of arguments and runs the simulation
  * 
  * Arguments:
- * - number of arguments
- * - arguments
+ * - Number of arguments
+ * - Arguments
  * 
  * Returns:
  * - 0 on success, 1 if error

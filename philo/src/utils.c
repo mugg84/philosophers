@@ -6,12 +6,20 @@
 /*   By: mmughedd <mmughedd@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/11 12:38:16 by mmughedd          #+#    #+#             */
-/*   Updated: 2024/04/30 12:33:43 by mmughedd         ###   ########.fr       */
+/*   Updated: 2024/05/07 07:07:29 by mmughedd         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
+/* Checks if string to be converted is a positive int and skips initial spaces
+
+ * Arguments:
+ * - N - string to be converted to long int
+ * 
+ * Returns:
+ * - String of number characters
+ */
 char	*check_input(char *n)
 {
 	int		len;
@@ -37,6 +45,14 @@ char	*check_input(char *n)
 	return (res);
 }
 
+/* Same as atoi(), but for long int
+
+ * Arguments:
+ * - N - string to be converted to long int
+ * 
+ * Returns:
+ * - Long int
+ */
 long	ft_atol(char *n)
 {
 	long	res;
@@ -54,6 +70,15 @@ long	ft_atol(char *n)
 	return (res);
 }
 
+/* Closes processes, semaphores and frees structures
+
+ * Arguments:
+ * - Data struct
+ * - Philo struct
+ * 
+ * Returns:
+ * - Nothing
+ */
 void	free_data(t_data *data)
 {
 	int	i;
@@ -70,12 +95,28 @@ void	free_data(t_data *data)
 	free(data->philos);
 }
 
+/* Waits until all the threads are ready
+
+ * Arguments:
+ * - Data struct
+ * 
+ * Returns:
+ * - Nothing
+ */
 void	wait_threads(t_data *data)
 {
 	while (!wait_is_ready(data))
 		;
 }
 
+/* Creates all the threads and runs the philo simulation
+
+ * Arguments:
+ * - Data struct
+ * 
+ * Returns:
+ * - Nothing
+ */
 void	create_threads(t_data *d)
 {
 	int	i;

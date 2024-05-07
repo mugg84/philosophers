@@ -6,7 +6,7 @@
 /*   By: mmughedd <mmughedd@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/05 08:18:35 by mmughedd          #+#    #+#             */
-/*   Updated: 2024/05/06 12:20:24 by mmughedd         ###   ########.fr       */
+/*   Updated: 2024/05/07 07:02:09 by mmughedd         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 /* Checks philo structure is_dead flag
  * 
  * Arguments:
- * - philo structure
+ * - Philo structure
  * 
  * Returns:
  * - True if is_dead, false otherwhise
@@ -36,7 +36,7 @@ bool	is_dead(t_philo *philo)
  * and if so sets the is_dead flag to true
  * 
  * Arguments:
- * - philo structure
+ * - Philo structure
  * 
  * Returns:
  * - True if is_dead, false otherwhise
@@ -58,7 +58,7 @@ bool	check_is_dead(t_philo *philo)
 /* Checks philo structure is_full flag
  * 
  * Arguments:
- * - philo structure
+ * - Philo structure
  * 
  * Returns:
  * - True if is_full, false otherwhise
@@ -78,7 +78,7 @@ bool	is_full(t_philo *philo)
 /* Checks philo structure is_finished flag
  * 
  * Arguments:
- * - philo structure
+ * - Philo structure
  * 
  * Returns:
  * - True if is_finished, false otherwhise

@@ -6,12 +6,20 @@
 /*   By: mmughedd <mmughedd@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/30 11:52:00 by mmughedd          #+#    #+#             */
-/*   Updated: 2024/05/06 12:49:24 by mmughedd         ###   ########.fr       */
+/*   Updated: 2024/05/07 07:02:09 by mmughedd         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
+/* Takes two forks, eating, put back forks
+ * 
+ * Arguments:
+ * - Philo structure
+ * 
+ * Returns:
+ * - Nothing
+ */
 void	eating(t_philo *philo)
 {
 	pthread_mutex_lock(&philo->first_fork->fork);
@@ -35,12 +43,29 @@ void	eating(t_philo *philo)
 	pthread_mutex_unlock(&philo->second_fork->fork);
 }
 
+/* Prints sleep status and waits
+ * 
+ * Arguments:
+ * - Philo structure
+ * 
+ * Returns:
+ * - Nothing
+ */
 void	sleeping(t_philo *philo)
 {
 	print_status(SLEEPING, philo);
 	usleep_updated(philo->data->time_to_sleep, philo->data);
 }
 
+/* Handles thinking action
+ * 
+ * Arguments:
+ * - Philo structure
+ * - For_desync - flag for thinking action or desync philosphers
+ * 
+ * Returns:
+ * - Nothing
+ */
 void	thinking(t_philo *philo, bool for_desync)
 {
 	long	t_eat;

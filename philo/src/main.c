@@ -6,12 +6,21 @@
 /*   By: mmughedd <mmughedd@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/11 09:26:10 by mmughedd          #+#    #+#             */
-/*   Updated: 2024/05/06 12:53:23 by mmughedd         ###   ########.fr       */
+/*   Updated: 2024/05/07 07:02:21 by mmughedd         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
+/* Parses the args and if valid, it assigns them to data structure
+
+ * Arguments:
+ * - Argv strings
+ * - Data struct
+ * 
+ * Returns:
+ * - Nothing
+ */
 void	parser(char *argv[], t_data **data)
 {
 	(*data)->philo_number = ft_atol(argv[1]);
@@ -29,6 +38,14 @@ void	parser(char *argv[], t_data **data)
 		(*data)->meals_number = -1;
 }
 
+/* Runs the simultion for a philo process
+ * 
+ * Arguments:
+ * - V_philo structure
+ * 
+ * Returns:
+ * - Nothing
+ */
 void	*run_sim(void *v_philo)
 {
 	t_philo	*philo;
@@ -51,6 +68,14 @@ void	*run_sim(void *v_philo)
 	return (NULL);
 }
 
+/* Initiate the simulation, creates all philo processes
+ * 
+ * Arguments:
+ * - D structure
+ * 
+ * Returns:
+ * - Nothing
+ */
 void	sim_init(t_data *d)
 {
 	int	i;
@@ -73,6 +98,14 @@ void	sim_init(t_data *d)
 	pthread_join(d->monitor, NULL);
 }
 
+/* Sets data structure members
+ * 
+ * Arguments:
+ * - Data structure
+ * 
+ * Returns:
+ * - Nothing
+ */
 void	init(t_data *data)
 {
 	int	i;
@@ -100,6 +133,15 @@ void	init(t_data *data)
 	philo_init(data);
 }
 
+/* Checks the number of arguments and runs the simulation
+ * 
+ * Arguments:
+ * - Number of arguments
+ * - Arguments
+ * 
+ * Returns:
+ * - 0 on success, 1 if error
+ */
 int	main(int argc, char *argv[])
 {
 	t_data	*data;
