@@ -93,6 +93,7 @@ void	free_data(t_data *data)
 	pthread_mutex_destroy(&(data->write_mutex));
 	free(data->forks);
 	free(data->philos);
+	free(data);
 }
 
 /* Waits until all the threads are ready
